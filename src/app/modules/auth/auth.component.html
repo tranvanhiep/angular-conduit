@@ -12,39 +12,43 @@
           >
         </p>
 
-        <ul class="error-messages">
-          <li>That email is already taken</li>
-        </ul>
+        <app-error-list [errors]="errors.errors"></app-error-list>
 
         <form [formGroup]="authForm">
-          <fieldset class="form-group">
-            <input
-              class="form-control form-control-lg"
-              type="text"
-              placeholder="Your Name"
-              *ngIf="authType === 'register'"
-              formControlName="username"
-            />
+          <fieldset [disabled]="isSubmitting">
+            <fieldset class="form-group">
+              <input
+                class="form-control form-control-lg"
+                type="text"
+                placeholder="Your Name"
+                *ngIf="authType === 'register'"
+                formControlName="username"
+              />
+            </fieldset>
+            <fieldset class="form-group">
+              <input
+                class="form-control form-control-lg"
+                type="text"
+                placeholder="Email"
+                formControlName="email"
+              />
+            </fieldset>
+            <fieldset class="form-group">
+              <input
+                class="form-control form-control-lg"
+                type="password"
+                placeholder="Password"
+                formControlName="password"
+              />
+            </fieldset>
+            <button
+              type="submit"
+              class="btn btn-lg btn-primary pull-xs-right"
+              [disabled]="!authForm.valid"
+            >
+              {{ title }}
+            </button>
           </fieldset>
-          <fieldset class="form-group">
-            <input
-              class="form-control form-control-lg"
-              type="text"
-              placeholder="Email"
-              formControlName="email"
-            />
-          </fieldset>
-          <fieldset class="form-group">
-            <input
-              class="form-control form-control-lg"
-              type="password"
-              placeholder="Password"
-              formControlName="password"
-            />
-          </fieldset>
-          <button type="submit" class="btn btn-lg btn-primary pull-xs-right">
-            {{ title }}
-          </button>
         </form>
       </div>
     </div>
