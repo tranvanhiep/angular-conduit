@@ -28,8 +28,8 @@ export class AuthComponent implements OnInit {
     private router: Router
   ) {
     this.authForm = this.fb.group({
-      email: ['', Validators.required, Validators.email],
-      password: ['', Validators.required, Validators.minLength(6)],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
@@ -47,8 +47,20 @@ export class AuthComponent implements OnInit {
     }
   }
 
+  get email() {
+    return this.authForm.get('email');
+  }
+
+  get password() {
+    return this.authForm.get('password');
+  }
+
+  get username() {
+    return this.authForm.get('username');
+  }
+
   submit() {
-    const credentials = this.authForm.value();
+    const credentials = this.authForm.value;
 
     this.isSubmitting = true;
     this.userService.attempAuth(this.authType, credentials).subscribe(

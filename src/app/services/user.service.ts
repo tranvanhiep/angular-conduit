@@ -40,7 +40,7 @@ export class UserService {
   attempAuth(type: string, user: object): Observable<User> {
     const route = type === 'login' ? '/login' : '';
 
-    return this.apiService.post(`users${route}`, { user }).pipe(
+    return this.apiService.post(`/users${route}`, { user }).pipe(
       map(data => {
         this.setAuth(data.user);
         return data.user;
@@ -49,7 +49,7 @@ export class UserService {
   }
 
   getCurrentUser(): Observable<User> {
-    return this.apiService.get('users').pipe(
+    return this.apiService.get('/users').pipe(
       map(data => {
         this.currentUserSubject.next(data.user);
         return data.user;
@@ -58,11 +58,26 @@ export class UserService {
   }
 
   updateCurrentUser(user: User): Observable<User> {
-    return this.apiService.put('users', { user }).pipe(
+    return this.apiService.put('/users', { user }).pipe(
       map(data => {
         this.currentUserSubject.next(data.user);
         return data.user;
       })
     );
+  }
+
+  populate() {
+    if (this.jwtService.getToken()) {
+      this.apiService.get('/user').subscribe(
+        data => {
+          this.setAuth(data.user as User);
+        },
+        err => {
+          this.purgeAuth();
+        }
+      );
+    } else {
+      this.purgeAuth();
+    }
   }
 }

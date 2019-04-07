@@ -14,16 +14,23 @@
 
         <app-error-list [errors]="errors.errors"></app-error-list>
 
-        <form [formGroup]="authForm">
+        <form [formGroup]="authForm" (ngSubmit)="submit()">
           <fieldset [disabled]="isSubmitting">
-            <fieldset class="form-group">
+            <fieldset class="form-group" *ngIf="authType === 'register'">
               <input
                 class="form-control form-control-lg"
                 type="text"
                 placeholder="Your Name"
-                *ngIf="authType === 'register'"
                 formControlName="username"
               />
+              <div
+                class="error-messages"
+                *ngIf="username.invalid && (username.dirty || username.touched)"
+              >
+                <div *ngIf="username.errors.required">
+                  This field is required
+                </div>
+              </div>
             </fieldset>
             <fieldset class="form-group">
               <input
@@ -32,6 +39,17 @@
                 placeholder="Email"
                 formControlName="email"
               />
+              <div
+                class="error-messages"
+                *ngIf="email.invalid && (email.dirty || email.touched)"
+              >
+                <div *ngIf="email.errors.required">
+                  This field is required
+                </div>
+                <div *ngIf="email.errors.email">
+                  This email address is invalid
+                </div>
+              </div>
             </fieldset>
             <fieldset class="form-group">
               <input
@@ -40,6 +58,17 @@
                 placeholder="Password"
                 formControlName="password"
               />
+              <div
+                class="error-messages"
+                *ngIf="password.invalid && (password.dirty || password.touched)"
+              >
+                <div *ngIf="password.errors.required">
+                  This field is required
+                </div>
+                <div *ngIf="password.errors.minlength">
+                  This password should contain six characters or over
+                </div>
+              </div>
             </fieldset>
             <button
               type="submit"

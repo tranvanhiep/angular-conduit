@@ -26,8 +26,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     req = req.clone({ setHeaders: headers });
 
     if (
-      !!token &&
-      req.method !== 'GET' &&
+      token &&
       req.method !== 'OPTIONS' &&
       req.method !== 'HEAD'
     ) {
