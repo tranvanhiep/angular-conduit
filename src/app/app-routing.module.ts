@@ -10,6 +10,14 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: './modules/settings/settings.module#SettingsModule',
   },
+  {
+    path: 'editor',
+    loadChildren: './modules/editor/editor.module#EditorModule',
+  },
+  {
+    path: 'profile',
+    loadChildren: './modules/profile/profile.module#ProfileModule',
+  },
 ];
 
 @NgModule({

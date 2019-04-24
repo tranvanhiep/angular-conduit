@@ -19,21 +19,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     const token = this.jwtService.getToken();
-    const headers = {
+    let headers = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     };
-    req = req.clone({ setHeaders: headers });
 
-    if (
-      token &&
-      req.method !== 'OPTIONS' &&
-      req.method !== 'HEAD'
-    ) {
-      req = req.clone({
-        headers: req.headers.append('Authorization', `Token ${token}`),
-      });
+    if (token && req.method !== 'OPTIONS' && req.method !== 'HEAD') {
+      const tokenHeader = { Authorization: `Token ${token}` };
+      headers = { ...headers, ...tokenHeader };
     }
+    req = req.clone({ setHeaders: headers });
 
     return next.handle(req);
   }

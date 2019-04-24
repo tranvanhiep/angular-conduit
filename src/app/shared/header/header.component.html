@@ -1,65 +1,67 @@
 <nav class="navbar navbar-light">
   <div class="container">
     <a class="navbar-brand" href="/">conduit</a>
-    <ul class="nav navbar-nav pull-xs-right" *appShowAuthed="false">
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/']" [routerLinkActive]="['active']"
-          >Home</a
-        >
-      </li>
+    <ul class="nav navbar-nav pull-xs-right">
       <li class="nav-item">
         <a
           class="nav-link"
-          [routerLink]="['/login']"
-          [routerLinkActive]="['active']"
-          >Sign in</a
-        >
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          [routerLink]="['/register']"
-          [routerLinkActive]="['active']"
-          >Sign up</a
-        >
-      </li>
-    </ul>
-    <ul class="nav navbar-nav pull-xs-right" *appShowAuthed="true">
-      <li class="nav-item">
-        <!-- Add "active" class when you're on that page" -->
-        <a
-          class="nav-link active"
           [routerLink]="['/']"
           [routerLinkActive]="['active']"
-          >Home</a
+          [routerLinkActiveOptions]="{ exact: true }"
         >
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          [routerLink]="['/editor']"
-          [routerLinkActive]="['active']"
-        >
-          <i class="ion-compose"></i>&nbsp;New Post
+          Home
         </a>
       </li>
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          [routerLink]="['/settings']"
-          [routerLinkActive]="['active']"
-        >
-          <i class="ion-gear-a"></i>&nbsp;Settings
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          [routerLink]="['/profile', currentUser.username]"
-          [routerLinkActive]="['active']"
-          >{{ currentUser.username }}</a
-        >
-      </li>
+      <ng-container *appShowAuthed="false">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/login']"
+            [routerLinkActive]="['active']"
+          >
+            Sign in
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/register']"
+            [routerLinkActive]="['active']"
+          >
+            Sign up
+          </a>
+        </li>
+      </ng-container>
+      <ng-container *appShowAuthed="true">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/editor']"
+            [routerLinkActive]="['active']"
+          >
+            <i class="ion-compose"></i>&nbsp;New Post
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/settings']"
+            [routerLinkActive]="['active']"
+          >
+            <i class="ion-gear-a"></i>&nbsp;Settings
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="['/profile', currentUser.username]"
+            [routerLinkActive]="['active']"
+          >
+            <img [src]="currentUser.image" class="user-pic" />
+            {{ currentUser.username }}
+          </a>
+        </li>
+      </ng-container>
     </ul>
   </div>
 </nav>

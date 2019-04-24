@@ -8,7 +8,7 @@ export class ShowAuthedDirective {
   condition: boolean;
 
   constructor(
-    private templateRef: TemplateRef<any>,
+    private template: TemplateRef<any>,
     private viewContainer: ViewContainerRef,
     private userService: UserService
   ) {
@@ -17,7 +17,7 @@ export class ShowAuthedDirective {
         (isAuthenticated && this.condition) ||
         (!isAuthenticated && !this.condition)
       ) {
-        this.viewContainer.createEmbeddedView(this.templateRef);
+        this.viewContainer.createEmbeddedView(this.template);
       } else {
         this.viewContainer.clear();
       }
