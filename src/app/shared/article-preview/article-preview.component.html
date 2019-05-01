@@ -9,9 +9,13 @@
       }}</a>
       <span class="date">{{ article.createdAt | date: "longDate" }}</span>
     </div>
-    <button class="btn btn-outline-primary btn-sm pull-xs-right">
-      <i class="ion-heart"></i> {{ article.favoritesCount }}
-    </button>
+
+    <app-favorite-button
+      [article]="article"
+      (toogle)="onToggleFavorite($event)"
+    >
+      {{ article.favoritesCount }}
+    </app-favorite-button>
   </div>
   <a [routerLink]="['/article', article.slug]" class="preview-link">
     <h1>{{ article.title }}</h1>

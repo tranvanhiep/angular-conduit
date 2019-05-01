@@ -4,14 +4,22 @@ import { Article } from 'src/app/models';
 @Component({
   selector: 'app-article-preview',
   templateUrl: './article-preview.component.html',
-  styleUrls: ['./article-preview.component.scss']
+  styleUrls: ['./article-preview.component.scss'],
 })
 export class ArticlePreviewComponent implements OnInit {
   @Input() article: Article;
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  onToggleFavorite(favorited: boolean) {
+    this.article.favorited = favorited;
+
+    if (favorited) {
+      this.article.favoritesCount++;
+    } else {
+      this.article.favoritesCount--;
+    }
   }
-
 }

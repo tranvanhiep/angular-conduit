@@ -7,12 +7,14 @@ import { ShowAuthedDirective } from '../directives';
 import { ArticlePreviewComponent } from './article-preview/article-preview.component';
 import { RouterModule } from '@angular/router';
 import { ArticleListComponent } from './article-list/article-list.component';
+import { FavoriteButtonComponent } from './favorite-button/favorite-button.component';
 
 @NgModule({
   declarations: [
     ErrorListComponent,
     ArticlePreviewComponent,
     ArticleListComponent,
+    FavoriteButtonComponent,
     ShowAuthedDirective,
   ],
   imports: [
@@ -29,8 +31,8 @@ import { ArticleListComponent } from './article-list/article-list.component';
     HttpClientModule,
     RouterModule,
     ErrorListComponent,
-    ArticlePreviewComponent,
     ArticleListComponent,
+    FavoriteButtonComponent,
     ShowAuthedDirective,
   ],
 })
