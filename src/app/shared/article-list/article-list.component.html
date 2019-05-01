@@ -1,0 +1,24 @@
+<ng-container *ngFor="let article of articles">
+  <app-article-preview [article]="article"></app-article-preview>
+</ng-container>
+
+<div class="app-article-preview" [hidden]="!loading">
+  Loading...
+</div>
+
+<div class="app-article-preview" [hidden]="loading || articles.length">
+  No articles here... yet.
+</div>
+
+<nav [hidden]="loading || (totalPages.length < 2 && !loading)">
+  <ul class="pagination">
+    <li
+      class="page-item"
+      *ngFor="let page of totalPages"
+      [ngClass]="{ active: currentPage === page }"
+      (click)="setPage(page)"
+    >
+      <a class="page-link">{{ page }}</a>
+    </li>
+  </ul>
+</nav>
