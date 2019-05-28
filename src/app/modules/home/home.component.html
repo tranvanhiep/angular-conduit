@@ -13,9 +13,12 @@
           <ul class="nav nav-pills outline-active">
             <li class="nav-item">
               <a
-                class="nav-link disabled"
+                class="nav-link"
                 (click)="setList('feed')"
-                [ngClass]="{ active: config.type === 'feed' }"
+                [ngClass]="{
+                  active: config.type === 'feed',
+                  disabled: !isAuthenticated
+                }"
               >
                 Your Feed
               </a>
@@ -24,7 +27,9 @@
               <a
                 class="nav-link"
                 (click)="setList('all')"
-                [ngClass]="{ active: config.type === 'all' }"
+                [ngClass]="{
+                  active: config.type === 'all' && !config.filters.tag
+                }"
               >
                 Global Feed
               </a>

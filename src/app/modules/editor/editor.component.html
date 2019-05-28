@@ -2,13 +2,16 @@
   <div class="container page">
     <div class="row">
       <div class="col-md-10 offset-md-1 col-xs-12">
-        <form>
-          <fieldset>
+        <app-error-list [errors]="errors"></app-error-list>
+
+        <form [formGroup]="articleForm">
+          <fieldset [disabled]="isSubmitting">
             <fieldset class="form-group">
               <input
                 type="text"
                 class="form-control form-control-lg"
                 placeholder="Article Title"
+                formControlName="title"
               />
             </fieldset>
             <fieldset class="form-group">
@@ -16,6 +19,7 @@
                 type="text"
                 class="form-control"
                 placeholder="What's this article about?"
+                formControlName="description"
               />
             </fieldset>
             <fieldset class="form-group">
@@ -23,6 +27,7 @@
                 class="form-control"
                 rows="8"
                 placeholder="Write your article (in markdown)"
+                formControlName="body"
               ></textarea>
             </fieldset>
             <fieldset class="form-group">
@@ -30,10 +35,25 @@
                 type="text"
                 class="form-control"
                 placeholder="Enter tags"
+                [formControl]="tagField"
+                (keyup.enter)="addTag()"
               />
-              <div class="tag-list"></div>
+              <div class="tag-list">
+                <span
+                  class="tag-default tag-pill"
+                  *ngFor="let tag of article.tagList"
+                >
+                  <i class="ion-close-round" (click)="removeTag(tag)">
+                    {{ tag }}
+                  </i>
+                </span>
+              </div>
             </fieldset>
-            <button class="btn btn-lg pull-xs-right btn-primary" type="button">
+            <button
+              class="btn btn-lg pull-xs-right btn-primary"
+              type="button"
+              [disabled]="!articleForm.valid"
+            >
               Publish Article
             </button>
           </fieldset>

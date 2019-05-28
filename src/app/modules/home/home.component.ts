@@ -15,12 +15,14 @@ export class HomeComponent implements OnInit {
   };
   tags: string[] = [];
   tagLoaded = false;
+  isAuthenticated = false;
 
   constructor(private route: ActivatedRoute, private tagService: TagService) {}
 
   ngOnInit() {
     this.route.data.subscribe(isAuthenticated => {
       if (isAuthenticated) {
+        this.isAuthenticated = true;
         this.setList('feed');
       } else {
         this.setList('all');

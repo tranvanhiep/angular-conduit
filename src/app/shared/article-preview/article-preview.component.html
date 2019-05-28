@@ -11,6 +11,7 @@
     </div>
 
     <app-favorite-button
+      class="pull-xs-right"
       [article]="article"
       (toogle)="onToggleFavorite($event)"
     >
@@ -21,5 +22,13 @@
     <h1>{{ article.title }}</h1>
     <p>{{ article.description }}</p>
     <span>Read more...</span>
+    <ul class="tag-list">
+      <li
+        class="tag-default tag-pill tag-outline"
+        *ngFor="let tag of article.tagList"
+      >
+        {{ tag }}
+      </li>
+    </ul>
   </a>
 </div>

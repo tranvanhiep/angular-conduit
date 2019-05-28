@@ -18,6 +18,10 @@ const routes: Routes = [
     path: 'profile',
     loadChildren: './modules/profile/profile.module#ProfileModule',
   },
+  {
+    path: 'article',
+    loadChildren: './modules/article/article.module#ArticleModule',
+  },
 ];
 
 @NgModule({
