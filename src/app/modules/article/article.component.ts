@@ -27,4 +27,8 @@ export class ArticleComponent implements OnInit {
       this.article.favoritesCount--;
     }
   }
+
+  toggleFollow(follow: boolean) {
+    this.article.author.following = follow;
+  }
 }

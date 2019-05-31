@@ -1,4 +1,12 @@
-<button class="btn btn-sm btn-outline-secondary">
-    <i class="ion-plus-round"></i>
-    &nbsp; Follow Eric Simons <span class="counter">(10)</span>
-  </button>
+<button
+  class="btn btn-sm"
+  [ngClass]="{
+    'btn-outline-secondary': !profile.following,
+    'btn-secondary': profile.following
+  }"
+  [disabled]="isSubmitting"
+  (click)="toggleFollow()"
+>
+  <i class="ion-plus-round"></i>
+  &nbsp; {{ profile.following ? "Unfollow" : "Follow" }} {{ profile.username }}
+</button>

@@ -15,7 +15,10 @@
           >
           <span class="date">{{ article.createdAt | date: "longDate" }}</span>
         </div>
-
+        <app-follow-button
+          [profile]="article.author"
+          (toggle)="toggleFollow($event)"
+        ></app-follow-button>
         &nbsp;&nbsp;
         <app-favorite-button
           [article]="article"
@@ -40,16 +43,23 @@
 
     <div class="article-actions">
       <div class="article-meta">
-        <a href="profile.html"><img src="http://i.imgur.com/Qr71crq.jpg"/></a>
+        <a [routerLink]="['/profile', article.author.username]">
+          <img [src]="article.author.image" />
+        </a>
         <div class="info">
-          <a href="" class="author">Eric Simons</a>
-          <span class="date">January 20th</span>
+          <a
+            [routerLink]="['/profile', article.author.username]"
+            class="author"
+          >
+            {{ article.author.username }}
+          </a>
+          <span class="date">{{ article.createdAt | date: "longDate" }}</span>
         </div>
 
-        <button class="btn btn-sm btn-outline-secondary">
-          <i class="ion-plus-round"></i>
-          &nbsp; Follow Eric Simons <span class="counter">(10)</span>
-        </button>
+        <app-follow-button
+          [profile]="article.author"
+          (toggle)="toggleFollow($event)"
+        ></app-follow-button>
         &nbsp;
         <app-favorite-button
           [article]="article"

@@ -8,6 +8,7 @@ import { ArticlePreviewComponent } from './article-preview/article-preview.compo
 import { RouterModule } from '@angular/router';
 import { ArticleListComponent } from './article-list/article-list.component';
 import { FavoriteButtonComponent } from './favorite-button/favorite-button.component';
+import { FollowButtonComponent } from './follow-button/follow-button.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { FavoriteButtonComponent } from './favorite-button/favorite-button.compo
     ArticlePreviewComponent,
     ArticleListComponent,
     FavoriteButtonComponent,
+    FollowButtonComponent,
     ShowAuthedDirective,
   ],
   imports: [
@@ -33,6 +35,7 @@ import { FavoriteButtonComponent } from './favorite-button/favorite-button.compo
     ErrorListComponent,
     ArticleListComponent,
     FavoriteButtonComponent,
+    FollowButtonComponent,
     ShowAuthedDirective,
   ],
 })

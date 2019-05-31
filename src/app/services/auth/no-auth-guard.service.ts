@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
+import { UserService } from '../user.service';
 import {
+  Router,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
-  CanActivate,
-  Router,
 } from '@angular/router';
-import { UserService } from '../user.service';
-import { take, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { take, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuardService implements CanActivate {
+export class NoAuthGuardService {
   constructor(private userService: UserService, private router: Router) {}
 
   canActivate(
@@ -22,8 +21,8 @@ export class AuthGuardService implements CanActivate {
     return this.userService.isAuthenticated.pipe(
       take(1),
       map(isAuthed => {
-        if (!isAuthed) {
-          this.router.navigate(['/login']);
+        if (isAuthed) {
+          this.router.navigate(['/']);
           return false;
         }
         return true;
