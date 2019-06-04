@@ -1,15 +1,5 @@
 <div class="article-preview">
-  <div class="article-meta">
-    <a [routerLink]="['/profile', article.author.username]">
-      <img [src]="article.author.image" />
-    </a>
-    <div class="info">
-      <a [routerLink]="['/profile', article.author.username]" class="author">{{
-        article.author.username
-      }}</a>
-      <span class="date">{{ article.createdAt | date: "longDate" }}</span>
-    </div>
-
+  <app-article-meta [article]="article">
     <app-favorite-button
       class="pull-xs-right"
       [article]="article"
@@ -17,7 +7,7 @@
     >
       {{ article.favoritesCount }}
     </app-favorite-button>
-  </div>
+  </app-article-meta>
   <a [routerLink]="['/article', article.slug]" class="preview-link">
     <h1>{{ article.title }}</h1>
     <p>{{ article.description }}</p>

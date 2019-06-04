@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { map } from 'rxjs/operators';
-import { CommentBody } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -15,9 +14,9 @@ export class CommentService {
       .pipe(map(data => data.comments));
   }
 
-  add(slug: string, comment: CommentBody) {
+  add(slug: string, payload: string) {
     return this.apiService
-      .post(`/articles/${slug}/comments`, { comment })
+      .post(`/articles/${slug}/comments`, { comment: { body: payload } })
       .pipe(map(data => data.comment));
   }
 

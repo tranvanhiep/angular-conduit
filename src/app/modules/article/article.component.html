@@ -3,31 +3,38 @@
     <div class="container">
       <h1>{{ article.title }}</h1>
 
-      <div class="article-meta">
-        <a [routerLink]="['/profile', article.author.username]">
-          <img [src]="article.author.image" />
-        </a>
-        <div class="info">
+      <app-article-meta [article]="article">
+        <ng-container *ngIf="canModify">
           <a
-            [routerLink]="['/profile', article.author.username]"
-            class="author"
-            >{{ article.author.username }}</a
+            class="btn btn-sm btn-outline-secondary"
+            [routerLink]="['/editor', article.slug]"
           >
-          <span class="date">{{ article.createdAt | date: "longDate" }}</span>
-        </div>
-        <app-follow-button
-          [profile]="article.author"
-          (toggle)="toggleFollow($event)"
-        ></app-follow-button>
-        &nbsp;&nbsp;
-        <app-favorite-button
-          [article]="article"
-          (toogle)="toogleFavorite($event)"
-        >
-          Favorite Post
-          <span class="counter">({{ article.favoritesCount }})</span>
-        </app-favorite-button>
-      </div>
+            <i class="ion-edit"></i> Edit Article
+          </a>
+          &nbsp;
+          <button
+            class="btn btn-sm btn-outline-danger"
+            [disabled]="isDeleting"
+            (click)="deleteArticle()"
+          >
+            <i class="ion-trash-a"></i> Delete Article
+          </button>
+        </ng-container>
+        <ng-container *ngIf="!canModify">
+          <app-follow-button
+            [profile]="article.author"
+            (toggle)="onToggleFollow($event)"
+          ></app-follow-button>
+          &nbsp;&nbsp;
+          <app-favorite-button
+            [article]="article"
+            (toogle)="onToggleFavorite($event)"
+          >
+            Favorite Post
+            <span class="counter">({{ article.favoritesCount }})</span>
+          </app-favorite-button>
+        </ng-container>
+      </app-article-meta>
     </div>
   </div>
 
@@ -35,106 +42,90 @@
     <div class="row article-content">
       <div class="col-md-12">
         <h2 id="introducing-ionic">{{ article.description }}</h2>
-        <p>{{ article.body }}</p>
+        <div [innerHTML]="article.body"></div>
       </div>
     </div>
 
     <hr />
 
     <div class="article-actions">
-      <div class="article-meta">
-        <a [routerLink]="['/profile', article.author.username]">
-          <img [src]="article.author.image" />
-        </a>
-        <div class="info">
+      <app-article-meta [article]="article">
+        <ng-container *ngIf="canModify">
           <a
-            [routerLink]="['/profile', article.author.username]"
-            class="author"
+            class="btn btn-sm btn-outline-secondary"
+            [routerLink]="['/editor', article.slug]"
           >
-            {{ article.author.username }}
+            <i class="ion-edit"></i> Edit Article
           </a>
-          <span class="date">{{ article.createdAt | date: "longDate" }}</span>
-        </div>
+          &nbsp;
+          <button
+            class="btn btn-sm btn-outline-danger"
+            [disabled]="isDeleting"
+            (click)="deleteArticle()"
+          >
+            <i class="ion-trash-a"></i> Delete Article
+          </button>
+        </ng-container>
 
-        <app-follow-button
-          [profile]="article.author"
-          (toggle)="toggleFollow($event)"
-        ></app-follow-button>
-        &nbsp;
-        <app-favorite-button
-          [article]="article"
-          (toogle)="toogleFavorite($event)"
-        >
-          Favorite Post
-          <span class="counter">({{ article.favoritesCount }})</span>
-        </app-favorite-button>
-      </div>
+        <ng-container *ngIf="!canModify">
+          <app-follow-button
+            [profile]="article.author"
+            (toggle)="onToggleFollow($event)"
+          ></app-follow-button>
+          &nbsp;
+          <app-favorite-button
+            [article]="article"
+            (toogle)="onToggleFavorite($event)"
+          >
+            Favorite Post
+            <span class="counter">({{ article.favoritesCount }})</span>
+          </app-favorite-button>
+        </ng-container>
+      </app-article-meta>
     </div>
 
     <div class="row">
       <div class="col-xs-12 col-md-8 offset-md-2">
-        <form class="card comment-form">
-          <div class="card-block">
-            <textarea
-              class="form-control"
-              placeholder="Write a comment..."
-              rows="3"
-            ></textarea>
-          </div>
-          <div class="card-footer">
-            <img
-              src="http://i.imgur.com/Qr71crq.jpg"
-              class="comment-author-img"
-            />
-            <button class="btn btn-sm btn-primary">
-              Post Comment
-            </button>
-          </div>
-        </form>
+        <ng-container *appShowAuthed="true">
+          <app-error-list [errors]="commentErrors"></app-error-list>
 
-        <div class="card">
-          <div class="card-block">
-            <p class="card-text">
-              With supporting text below as a natural lead-in to additional
-              content.
-            </p>
-          </div>
-          <div class="card-footer">
-            <a href="" class="comment-author">
-              <img
-                src="http://i.imgur.com/Qr71crq.jpg"
-                class="comment-author-img"
-              />
-            </a>
-            &nbsp;
-            <a href="" class="comment-author">Jacob Schmidt</a>
-            <span class="date-posted">Dec 29th</span>
-          </div>
+          <form class="card comment-form" (ngSubmit)="addComment()">
+            <fieldset [disabled]="isSubmitting">
+              <div class="card-block">
+                <textarea
+                  class="form-control"
+                  placeholder="Write a comment..."
+                  rows="3"
+                  [formControl]="commentControl"
+                ></textarea>
+              </div>
+              <div class="card-footer">
+                <img [src]="currentUser.image" class="comment-author-img" />
+                <button
+                  class="btn btn-sm btn-primary"
+                  type="submit"
+                  [disabled]="isSubmitting || commentControl.invalid"
+                >
+                  Post Comment
+                </button>
+              </div>
+            </fieldset>
+          </form>
+
+          <div class="error-messages">This fields is required.</div>
+        </ng-container>
+        <div *appShowAuthed="false">
+          <a [routerLink]="['/login']">Sign in</a> or
+          <a [routerLink]="['/register']">sign up</a> to add comments on this
+          article.
         </div>
 
-        <div class="card">
-          <div class="card-block">
-            <p class="card-text">
-              With supporting text below as a natural lead-in to additional
-              content.
-            </p>
-          </div>
-          <div class="card-footer">
-            <a href="" class="comment-author">
-              <img
-                src="http://i.imgur.com/Qr71crq.jpg"
-                class="comment-author-img"
-              />
-            </a>
-            &nbsp;
-            <a href="" class="comment-author">Jacob Schmidt</a>
-            <span class="date-posted">Dec 29th</span>
-            <span class="mod-options">
-              <i class="ion-edit"></i>
-              <i class="ion-trash-a"></i>
-            </span>
-          </div>
-        </div>
+        <app-article-comment
+          *ngFor="let comment of comments"
+          [slug]="article.slug"
+          [comment]="comment"
+          (deleteComment)="onDeleteComment($event)"
+        ></app-article-comment>
       </div>
     </div>
   </div>

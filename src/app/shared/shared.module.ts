@@ -9,14 +9,18 @@ import { RouterModule } from '@angular/router';
 import { ArticleListComponent } from './article-list/article-list.component';
 import { FavoriteButtonComponent } from './favorite-button/favorite-button.component';
 import { FollowButtonComponent } from './follow-button/follow-button.component';
+import { ArticleCommentComponent } from './article-comment/article-comment.component';
+import { ArticleMetaComponent } from './article-meta/article-meta.component';
 
 @NgModule({
   declarations: [
     ErrorListComponent,
     ArticlePreviewComponent,
+    ArticleMetaComponent,
     ArticleListComponent,
     FavoriteButtonComponent,
     FollowButtonComponent,
+    ArticleCommentComponent,
     ShowAuthedDirective,
   ],
   imports: [
@@ -33,9 +37,11 @@ import { FollowButtonComponent } from './follow-button/follow-button.component';
     HttpClientModule,
     RouterModule,
     ErrorListComponent,
+    ArticleMetaComponent,
     ArticleListComponent,
     FavoriteButtonComponent,
     FollowButtonComponent,
+    ArticleCommentComponent,
     ShowAuthedDirective,
   ],
 })

@@ -38,8 +38,10 @@ export class EditorComponent implements OnInit {
 
   ngOnInit() {
     this.route.data.subscribe(data => {
-      this.article = data.article;
-      this.articleForm.patchValue(data.article);
+      if (!!data.article) {
+        this.article = data.article;
+        this.articleForm.patchValue(data.article);
+      }
     });
   }
 

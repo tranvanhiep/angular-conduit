@@ -6,3 +6,4 @@ export * from './tag.service';
 export * from './auth';
 export * from './article';
 export * from './profile.service';
+export * from './comment.service';
