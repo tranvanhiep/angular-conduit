@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
 import { EditorRoutingModule } from './editor-routing.module';
-import { SharedModule } from 'src/app/shared';
+import { SharedModule } from '../shared.module';
 import { EditorComponent } from './editor.component';
 
 @NgModule({

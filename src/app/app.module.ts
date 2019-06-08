@@ -3,8 +3,8 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { HeaderComponent, FooterComponent, SharedModule } from './shared';
-import { InterceptorModule } from './modules';
+import { HeaderComponent, FooterComponent } from './components';
+import { InterceptorModule, SharedModule } from './modules';
 import { AuthModule } from './modules/auth/auth.module';
 
 @NgModule({
