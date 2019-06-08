@@ -27,7 +27,7 @@
                 class="error-messages"
                 *ngIf="username.invalid && (username.dirty || username.touched)"
               >
-                <div *ngIf="username.errors.required">
+                <div *ngIf="username.errors?.required">
                   This field is required
                 </div>
               </div>
@@ -43,10 +43,10 @@
                 class="error-messages"
                 *ngIf="email.invalid && (email.dirty || email.touched)"
               >
-                <div *ngIf="email.errors.required">
+                <div *ngIf="email.errors?.required">
                   This field is required
                 </div>
-                <div *ngIf="email.errors.email">
+                <div *ngIf="email.errors?.email">
                   This email address is invalid
                 </div>
               </div>
@@ -62,10 +62,10 @@
                 class="error-messages"
                 *ngIf="password.invalid && (password.dirty || password.touched)"
               >
-                <div *ngIf="password.errors.required">
+                <div *ngIf="password.errors?.required">
                   This field is required
                 </div>
-                <div *ngIf="password.errors.minlength">
+                <div *ngIf="password.errors?.minlength">
                   This password should contain six characters or over
                 </div>
               </div>

@@ -4,7 +4,7 @@
       <div class="col-md-10 offset-md-1 col-xs-12">
         <app-error-list [errors]="errors"></app-error-list>
 
-        <form [formGroup]="articleForm">
+        <form [formGroup]="articleForm" (ngSubmit)="submit()">
           <fieldset [disabled]="isSubmitting">
             <fieldset class="form-group">
               <input
@@ -51,7 +51,7 @@
             </fieldset>
             <button
               class="btn btn-lg pull-xs-right btn-primary"
-              type="button"
+              type="submit"
               [disabled]="!articleForm.valid"
             >
               Publish Article

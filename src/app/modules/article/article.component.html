@@ -42,7 +42,16 @@
     <div class="row article-content">
       <div class="col-md-12">
         <h2 id="introducing-ionic">{{ article.description }}</h2>
-        <div [innerHTML]="article.body"></div>
+        <div [innerHTML]="article.body | markdown"></div>
+
+        <ul class="tag-list">
+          <li
+            *ngFor="let tag of article.tagList"
+            class="tag-default tag-pill tag-outline"
+          >
+            {{ tag }}
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -112,8 +121,18 @@
             </fieldset>
           </form>
 
-          <div class="error-messages">This fields is required.</div>
+          <div
+            class="error-messages"
+            *ngIf="
+              commentControl.invalid &&
+              (commentControl.touched || commentControl.dirty) &&
+              commentControl.errors?.notNull
+            "
+          >
+            This fields is required.
+          </div>
         </ng-container>
+
         <div *appShowAuthed="false">
           <a [routerLink]="['/login']">Sign in</a> or
           <a [routerLink]="['/register']">sign up</a> to add comments on this

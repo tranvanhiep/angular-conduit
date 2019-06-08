@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Article, Comment, User, Errors } from 'src/app/models';
 import { CommentService, UserService, ArticleService } from 'src/app/services';
-import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { FormControl, Validators } from '@angular/forms';
+import { notNullValidator } from 'src/app/directives';
 
 @Component({
   selector: 'app-article',
@@ -18,8 +18,8 @@ export class ArticleComponent implements OnInit, OnDestroy {
   canModify = false;
   isDeleting = false;
   isSubmitting = false;
-  commentControl = new FormControl('', [Validators.required]);
-  commentErrors = { errors: {} };
+  commentControl = new FormControl('', [Validators.required, notNullValidator]);
+  commentErrors: Errors = { errors: {} };
 
   private subscription: Subscription;
 
@@ -57,8 +57,8 @@ export class ArticleComponent implements OnInit, OnDestroy {
     }
   }
 
-  onToggleFollow(follow: boolean) {
-    this.article.author.following = follow;
+  onToggleFollow(following: boolean) {
+    this.article.author.following = following;
   }
 
   populateComments() {
@@ -90,7 +90,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
     this.commentErrors = { errors: {} };
 
     this.commentService
-      .add(this.article.slug, this.commentControl.value)
+      .add(this.article.slug, String(this.commentControl.value).trim())
       .subscribe(
         comment => {
           this.isSubmitting = false;
