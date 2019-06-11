@@ -1,19 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserService } from 'src/app/services';
 import { User, Errors } from 'src/app/models';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, OnDestroy {
   user: User;
   settingsForm: FormGroup;
   errors: Errors = { errors: {} };
   isSubmitting = false;
+
+  private subscription: Subscription;
 
   constructor(
     private userService: UserService,
@@ -21,17 +24,23 @@ export class SettingsComponent implements OnInit {
     private router: Router
   ) {
     this.settingsForm = this.fb.group({
-      image: ['', Validators.required],
+      image: [''],
       username: ['', Validators.required],
-      bio: ['', Validators.required],
+      bio: [''],
       email: ['', Validators.required],
       password: ['', Validators.required],
     });
   }
 
   ngOnInit() {
-    this.user = this.userService.getCurrentUser();
+    this.subscription = this.userService.currentUser.subscribe(user => {
+      this.user = user;
+    });
     this.settingsForm.patchValue(this.user);
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   logout() {

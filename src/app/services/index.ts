@@ -5,5 +5,5 @@ export * from './article/article.service';
 export * from './tag.service';
 export * from './auth';
 export * from './article';
-export * from './profile.service';
+export * from './profile';
 export * from './comment.service';
