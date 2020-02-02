@@ -20,7 +20,7 @@ export class EditorComponent implements OnInit {
   article: Article = {} as Article;
   tagField = new FormControl('');
   isSubmitting = false;
-  errors: Errors = { errors: {} };
+  errors: Errors = {};
 
   constructor(
     private fb: FormBuilder,

@@ -1,9 +1,16 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Profile } from 'src/app/models';
-import { ProfileService, UserService } from 'src/app/services';
+import { UserService } from 'src/app/services';
 import { Router } from '@angular/router';
-import { concatMap, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { State } from 'src/app/reducers';
+import {
+  follow,
+  unfollow,
+  followArticle,
+  unfollowArticle,
+} from 'src/app/actions';
+import { take, exhaustMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-follow-button',
@@ -12,53 +19,44 @@ import { of } from 'rxjs';
 })
 export class FollowButtonComponent implements OnInit {
   @Input() profile: Profile;
-  @Output() toggle = new EventEmitter<boolean>();
-  isSubmitting = false;
+  @Input() isSubmitting = false;
 
   constructor(
-    private profileService: ProfileService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private store: Store<State>
   ) {}
 
   ngOnInit() {}
 
   toggleFollow() {
-    this.userService.isAuthenticated
+    this.store
       .pipe(
-        concatMap(isAuthed => {
+        select(this.userService.isAuthenticated),
+        take(1),
+        exhaustMap(isAuthed => {
           if (!isAuthed) {
             this.router.navigate(['/login']);
-            return of(null);
           }
-
-          if (!this.profile.following) {
-            return this.profileService.follow(this.profile.username).pipe(
-              tap(
-                data => {
-                  this.isSubmitting = false;
-                  this.toggle.emit(true);
-                },
-                err => {
-                  this.isSubmitting = false;
-                }
-              )
-            );
-          } else {
-            return this.profileService.unfollow(this.profile.username).pipe(
-              tap(
-                data => {
-                  this.isSubmitting = false;
-                  this.toggle.emit(false);
-                },
-                err => {
-                  this.isSubmitting = false;
-                }
-              )
-            );
-          }
+          return this.store.pipe(select(state => state.router));
         })
       )
-      .subscribe();
+      .subscribe(({ state }) => {
+        const { username } = this.profile;
+
+        if (/\/profile\//.test(state.url)) {
+          if (!this.profile.following) {
+            this.store.dispatch(follow({ username }));
+          } else {
+            this.store.dispatch(unfollow({ username }));
+          }
+        } else {
+          if (!this.profile.following) {
+            this.store.dispatch(followArticle({ username }));
+          } else {
+            this.store.dispatch(unfollowArticle({ username }));
+          }
+        }
+      });
   }
 }

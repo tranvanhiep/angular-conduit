@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ProfileComponent } from './profile.component';
-import { ProfileResolverService } from 'src/app/services';
 import {
   ProfileArticleComponent,
   ProfileFavoriteComponent,
@@ -11,9 +10,6 @@ const routes: Routes = [
   {
     path: ':username',
     component: ProfileComponent,
-    resolve: {
-      profile: ProfileResolverService,
-    },
     children: [
       {
         path: '',

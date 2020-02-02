@@ -1,4 +1,4 @@
-<div class="article-page">
+<div class="article-page" *ngIf="!loading && !!article">
   <div class="banner">
     <div class="container">
       <h1>{{ article.title }}</h1>
@@ -23,13 +23,10 @@
         <ng-container *ngIf="!canModify">
           <app-follow-button
             [profile]="article.author"
-            (toggle)="onToggleFollow($event)"
+            [isSubmitting]="following"
           ></app-follow-button>
           &nbsp;&nbsp;
-          <app-favorite-button
-            [article]="article"
-            (toogle)="onToggleFavorite($event)"
-          >
+          <app-favorite-button [article]="article" [isSubmitting]="favoriting">
             Favorite Post
             <span class="counter">({{ article.favoritesCount }})</span>
           </app-favorite-button>
@@ -37,6 +34,9 @@
       </app-article-meta>
     </div>
   </div>
+
+  <app-error-list [errors]="favoriteErrors"></app-error-list>
+  <app-error-list [errors]="followErrors"></app-error-list>
 
   <div class="container page">
     <div class="row article-content">
@@ -79,13 +79,10 @@
         <ng-container *ngIf="!canModify">
           <app-follow-button
             [profile]="article.author"
-            (toggle)="onToggleFollow($event)"
+            [isSubmitting]="following"
           ></app-follow-button>
           &nbsp;
-          <app-favorite-button
-            [article]="article"
-            (toogle)="onToggleFavorite($event)"
-          >
+          <app-favorite-button [article]="article" [isSubmitting]="favoriting">
             Favorite Post
             <span class="counter">({{ article.favoritesCount }})</span>
           </app-favorite-button>
@@ -99,7 +96,7 @@
           <app-error-list [errors]="commentErrors"></app-error-list>
 
           <form class="card comment-form" (ngSubmit)="addComment()">
-            <fieldset [disabled]="isSubmitting">
+            <fieldset [disabled]="submittingComment">
               <div class="card-block">
                 <textarea
                   class="form-control"
@@ -113,7 +110,7 @@
                 <button
                   class="btn btn-sm btn-primary"
                   type="submit"
-                  [disabled]="isSubmitting || commentControl.invalid"
+                  [disabled]="submittingComment || commentControl.invalid"
                 >
                   Post Comment
                 </button>
@@ -143,7 +140,7 @@
           *ngFor="let comment of comments"
           [slug]="article.slug"
           [comment]="comment"
-          (deleteComment)="onDeleteComment($event)"
+          [isDeletingComment]="deletingComment"
         ></app-article-comment>
       </div>
     </div>

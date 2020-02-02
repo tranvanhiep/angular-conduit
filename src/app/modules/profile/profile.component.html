@@ -1,4 +1,4 @@
-<div class="profile-page">
+<div class="profile-page" *ngIf="!loading && !!profile">
   <div class="user-info">
     <div class="container">
       <div class="row">
@@ -7,9 +7,9 @@
           <h4>{{ profile.username }}</h4>
           <p>{{ profile.bio }}</p>
           <app-follow-button
-            *ngIf="!isUser"
             [profile]="profile"
-            (toggle)="onToggleFollowing($event)"
+            [isSubmitting]="followRequesting"
+            *ngIf="!isUser"
           ></app-follow-button>
           <a
             [routerLink]="['/settings']"
@@ -22,6 +22,8 @@
       </div>
     </div>
   </div>
+
+  <app-error-list [errors]="errors"></app-error-list>
 
   <div class="container">
     <div class="row">

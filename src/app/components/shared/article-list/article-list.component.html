@@ -1,12 +1,20 @@
-<ng-container *ngFor="let article of articles">
-  <app-article-preview [article]="article"></app-article-preview>
+<app-error-list [errors]="errors"></app-error-list>
+
+<ng-container *ngIf="articles && !loading">
+  <app-article-preview
+    *ngFor="let article of articles"
+    [article]="article"
+  ></app-article-preview>
 </ng-container>
 
 <div class="app-article-preview" [hidden]="!loading">
   Loading...
 </div>
 
-<div class="app-article-preview" [hidden]="loading || articles.length">
+<div
+  class="app-article-preview"
+  [hidden]="loading || (articles && articles.length)"
+>
   No articles here... yet.
 </div>
 

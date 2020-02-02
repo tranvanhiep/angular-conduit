@@ -7,7 +7,7 @@
         <app-error-list [errors]="errors"></app-error-list>
 
         <form [formGroup]="settingsForm" (ngSubmit)="submit()">
-          <fieldset [disabled]="isSubmitting">
+          <fieldset [disabled]="isSubmitting || loading">
             <fieldset class="form-group">
               <input
                 class="form-control"

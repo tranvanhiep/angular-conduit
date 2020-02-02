@@ -4,23 +4,28 @@ import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: './modules/home/home.module#HomeModule',
+    loadChildren: () =>
+      import('./modules/home/home.module').then(m => m.HomeModule),
   },
   {
     path: 'settings',
-    loadChildren: './modules/settings/settings.module#SettingsModule',
+    loadChildren: () =>
+      import('./modules/settings/settings.module').then(m => m.SettingsModule),
   },
   {
     path: 'editor',
-    loadChildren: './modules/editor/editor.module#EditorModule',
+    loadChildren: () =>
+      import('./modules/editor/editor.module').then(m => m.EditorModule),
   },
   {
     path: 'profile',
-    loadChildren: './modules/profile/profile.module#ProfileModule',
+    loadChildren: () =>
+      import('./modules/profile/profile.module').then(m => m.ProfileModule),
   },
   {
     path: 'article',
-    loadChildren: './modules/article/article.module#ArticleModule',
+    loadChildren: () =>
+      import('./modules/article/article.module').then(m => m.ArticleModule),
   },
 ];
 

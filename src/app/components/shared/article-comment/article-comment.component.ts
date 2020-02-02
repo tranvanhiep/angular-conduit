@@ -1,14 +1,9 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  OnDestroy,
-  Output,
-  EventEmitter,
-} from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Comment } from 'src/app/models';
-import { UserService, CommentService } from 'src/app/services';
 import { Subscription } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { State } from 'src/app/reducers';
+import { deleteComment } from 'src/app/actions';
 
 @Component({
   selector: 'app-article-comment',
@@ -18,22 +13,22 @@ import { Subscription } from 'rxjs';
 export class ArticleCommentComponent implements OnInit, OnDestroy {
   @Input() slug: string;
   @Input() comment: Comment;
-  @Output() deleteComment = new EventEmitter<number>();
+  @Input() isDeletingComment = false;
 
   canModify = false;
-  isDeletingComment = false;
-
   private subscription: Subscription;
 
-  constructor(
-    private userService: UserService,
-    private commentService: CommentService
-  ) {}
+  constructor(private store: Store<State>) {}
 
   ngOnInit() {
-    this.subscription = this.userService.currentUser.subscribe(user => {
-      this.canModify = user.username === this.comment.author.username;
-    });
+    this.subscription = this.store
+      .pipe(select(state => state.app))
+      .subscribe(({ currentUser }) => {
+        if (currentUser) {
+          const { author } = this.comment;
+          this.canModify = currentUser.username === author.username;
+        }
+      });
   }
 
   ngOnDestroy() {
@@ -41,16 +36,8 @@ export class ArticleCommentComponent implements OnInit, OnDestroy {
   }
 
   delete() {
-    this.isDeletingComment = true;
-
-    this.commentService.destroy(this.slug, this.comment.id).subscribe(
-      data => {
-        this.isDeletingComment = false;
-        this.deleteComment.emit(this.comment.id);
-      },
-      err => {
-        this.isDeletingComment = false;
-      }
+    this.store.dispatch(
+      deleteComment({ slug: this.slug, id: this.comment.id })
     );
   }
 }

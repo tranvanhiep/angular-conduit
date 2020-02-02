@@ -1,5 +1,5 @@
 <div class="home-page">
-  <div class="banner">
+  <div class="banner" *ngIf="!isAuthenticated">
     <div class="container">
       <h1 class="logo-font">conduit</h1>
       <p>A place to share your knowledge.</p>
@@ -59,10 +59,10 @@
               {{ tag }}
             </a>
           </div>
-          <div [hidden]="tagLoaded">
+          <div [hidden]="!tagLoading">
             Loading...
           </div>
-          <div [hidden]="!tagLoaded || tags.length">
+          <div [hidden]="tagLoading || tags.length">
             No tags are here... yet.
           </div>
         </div>

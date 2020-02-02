@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ArticleConfig, Profile } from 'src/app/models';
-import { ActivatedRoute } from '@angular/router';
+import { ArticleConfig } from 'src/app/models';
+import { Store, select } from '@ngrx/store';
+import { State } from 'src/app/reducers';
 
 @Component({
   selector: 'app-profile-article',
@@ -8,16 +9,19 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./profile-article.component.scss'],
 })
 export class ProfileArticleComponent implements OnInit {
-  profileArticle: ArticleConfig = { type: 'all', filters: {} };
+  profileArticle: ArticleConfig;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private store: Store<State>) {}
 
   ngOnInit() {
-    this.route.parent.data.subscribe((data: { profile: Profile }) => {
-      this.profileArticle = {
-        ...this.profileArticle,
-        ...{ filters: { author: data.profile.username } },
-      };
+    this.store.pipe(select(state => state.profile)).subscribe(({ profile }) => {
+      if (profile) {
+        const { username } = profile;
+        this.profileArticle = {
+          type: 'all',
+          filters: { author: username },
+        };
+      }
     });
   }
 }

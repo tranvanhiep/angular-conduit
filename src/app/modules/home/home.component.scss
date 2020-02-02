@@ -1,5 +1,9 @@
 .nav-link {
   cursor:pointer;
+  &.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
 }
 
 .tag-pill{
