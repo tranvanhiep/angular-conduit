@@ -1,11 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { UserService } from 'src/app/services';
 import { User, Errors } from 'src/app/models';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { State } from 'src/app/reducers';
 import { updateUser, loadUser, resetSettings, logout } from 'src/app/actions';
+import { UserService } from 'src/app/services';
+import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -21,9 +23,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
-    private userService: UserService,
     private fb: FormBuilder,
-    private store: Store<State>
+    private store: Store<State>,
+    private userService: UserService,
+    private router: Router
   ) {
     this.settingsForm = this.fb.group({
       image: [''],
@@ -36,6 +39,14 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.store.dispatch(loadUser());
+
+    const authSub = this.store
+      .pipe(select(this.userService.isAuthenticated))
+      .subscribe(isAuthed => {
+        if (!isAuthed) {
+          this.router.navigate(['/login']);
+        }
+      });
 
     const userSub = this.store
       .pipe(select(state => state.app))
@@ -55,7 +66,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
         this.loading = loading;
       });
 
-    this.subscriptions.push(userSub, settingsSub);
+    this.subscriptions.push(authSub, userSub, settingsSub);
   }
 
   ngOnDestroy() {

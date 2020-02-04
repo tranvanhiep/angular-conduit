@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { ArticleConfig, Article, Errors } from 'src/app/models';
 import { Store, select } from '@ngrx/store';
 import { State } from 'src/app/reducers';
-import { loadArticles } from 'src/app/actions';
+import { loadArticles, resetArticles } from 'src/app/actions';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -33,10 +33,17 @@ export class ArticleListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const articlesSub = this.store
       .pipe(select(state => state.articleList))
-      .subscribe(({ articleLoading, articles, articlesCount, errors }) => {
+      .subscribe(articleListState => {
+        const {
+          articleLoading,
+          articles,
+          articlesCount,
+          articlesErrors,
+        } = articleListState;
+
         this.loading = articleLoading;
         this.articles = articles;
-        this.errors = errors;
+        this.errors = articlesErrors;
         this.totalPages = Array.from(
           new Array(Math.ceil(articlesCount / this.limit)),
           (value, key) => ++key
@@ -48,6 +55,7 @@ export class ArticleListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.store.dispatch(resetArticles());
   }
 
   diffChecker(oldObj: ArticleConfig, newObj: ArticleConfig) {

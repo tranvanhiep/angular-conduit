@@ -8,7 +8,7 @@ import { InterceptorModule, SharedModule } from './modules';
 import { AuthModule } from './modules/auth/auth.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule } from '@ngrx/store';
-import { reducers, metaReducers } from './reducers';
+import { reducers, metaReducers, CustomSerializer } from './reducers';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 import { EffectsModule } from '@ngrx/effects';
@@ -19,6 +19,7 @@ import {
   ProfileEffect,
   ArticleListEffect,
   ArticleEffect,
+  EditorEffect,
 } from './effects';
 import {
   StoreRouterConnectingModule,
@@ -53,10 +54,12 @@ import {
       ProfileEffect,
       ArticleListEffect,
       ArticleEffect,
+      EditorEffect,
     ]),
     StoreRouterConnectingModule.forRoot({
       navigationActionTiming: NavigationActionTiming.PostActivation,
       routerState: RouterState.Minimal,
+      serializer: CustomSerializer,
     }),
   ],
   providers: [],

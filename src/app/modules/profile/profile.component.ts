@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Profile, Errors } from 'src/app/models';
-import { ActivatedRoute } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { State } from 'src/app/reducers';
 import { ProfileService } from 'src/app/services';
 import { loadProfile, resetProfile } from 'src/app/actions';
 import { Subscription } from 'rxjs';
+import { take, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile',
@@ -21,20 +21,35 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
-    private route: ActivatedRoute,
     private profileService: ProfileService,
     private store: Store<State>
   ) {}
 
   ngOnInit() {
-    const routeSub = this.route.params.subscribe(params => {
-      const { username } = params;
-      this.store.dispatch(loadProfile({ username }));
-    });
+    const routerSub = this.store
+      .pipe(
+        distinctUntilChanged(
+          ({ router: prevRouter }, { router: currRouter }) =>
+            prevRouter.state.params.username ===
+            currRouter.state.params.username
+        ),
+        select(state => state.router)
+      )
+      .subscribe(({ state }) => {
+        const { username } = state.params;
+        this.store.dispatch(loadProfile({ username }));
+      });
 
     const profileSub = this.store
       .pipe(select(this.profileService.userProfile))
-      .subscribe(({ isUser, profile, loading, errors, followRequesting }) => {
+      .subscribe(profileState => {
+        const {
+          isUser,
+          profile,
+          loading,
+          errors,
+          followRequesting,
+        } = profileState;
         this.isUser = isUser;
         this.loading = loading;
         this.profile = profile;
@@ -42,11 +57,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.followRequesting = followRequesting;
       });
 
-    this.subscriptions.push(routeSub, profileSub);
+    this.subscriptions.push(routerSub, profileSub);
   }
 
   ngOnDestroy() {
-    this.store.dispatch(resetProfile());
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.store.dispatch(resetProfile());
   }
 }

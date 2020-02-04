@@ -10,6 +10,8 @@ import { Store, select } from '@ngrx/store';
 import { State } from 'src/app/reducers';
 import { login, register, resetAuth } from 'src/app/actions';
 import { Subscription } from 'rxjs';
+import { UserService } from 'src/app/services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth',
@@ -22,9 +24,14 @@ export class AuthComponent implements OnInit, OnDestroy {
   authForm: FormGroup;
   isSubmitting = false;
   errors: Errors;
-  subscriptions: Subscription[] = [];
+  private subscriptions: Subscription[] = [];
 
-  constructor(private fb: FormBuilder, private store: Store<State>) {
+  constructor(
+    private fb: FormBuilder,
+    private store: Store<State>,
+    private userService: UserService,
+    private router: Router
+  ) {
     this.authForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
@@ -32,6 +39,14 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    const authSub = this.store
+      .pipe(select(this.userService.isAuthenticated))
+      .subscribe(isAuthed => {
+        if (isAuthed) {
+          this.router.navigate(['/']);
+        }
+      });
+
     const routeSub = this.store
       .pipe(select(state => state.router))
       .subscribe(router => {
@@ -55,7 +70,7 @@ export class AuthComponent implements OnInit, OnDestroy {
         this.errors = errors;
       });
 
-    this.subscriptions.push(routeSub, storeSub);
+    this.subscriptions.push(authSub, routeSub, storeSub);
   }
 
   ngOnDestroy() {

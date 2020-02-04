@@ -33,18 +33,19 @@ export class FollowButtonComponent implements OnInit {
     this.store
       .pipe(
         select(this.userService.isAuthenticated),
-        take(1),
         exhaustMap(isAuthed => {
           if (!isAuthed) {
             this.router.navigate(['/login']);
           }
           return this.store.pipe(select(state => state.router));
-        })
+        }),
+        take(1)
       )
       .subscribe(({ state }) => {
         const { username } = this.profile;
+        const { params } = state;
 
-        if (/\/profile\//.test(state.url)) {
+        if (params && params.username) {
           if (!this.profile.following) {
             this.store.dispatch(follow({ username }));
           } else {

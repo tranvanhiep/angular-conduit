@@ -14,7 +14,7 @@
           &nbsp;
           <button
             class="btn btn-sm btn-outline-danger"
-            [disabled]="isDeleting"
+            [disabled]="deletingArticle"
             (click)="deleteArticle()"
           >
             <i class="ion-trash-a"></i> Delete Article
@@ -35,6 +35,7 @@
     </div>
   </div>
 
+  <app-error-list [errors]="articleErrors"></app-error-list>
   <app-error-list [errors]="favoriteErrors"></app-error-list>
   <app-error-list [errors]="followErrors"></app-error-list>
 
@@ -69,7 +70,7 @@
           &nbsp;
           <button
             class="btn btn-sm btn-outline-danger"
-            [disabled]="isDeleting"
+            [disabled]="deletingArticle"
             (click)="deleteArticle()"
           >
             <i class="ion-trash-a"></i> Delete Article

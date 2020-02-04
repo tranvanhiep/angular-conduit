@@ -134,17 +134,17 @@ export const addCommentFailure = createAction(
 );
 
 export const deleteComment = createAction(
-  ArticleAction.DeleteArticle,
+  ArticleAction.DeleteComment,
   props<{ slug: string; id: number }>()
 );
 
 export const deleteCommentSuccess = createAction(
-  ArticleAction.DeleteArticleSuccess,
+  ArticleAction.DeleteCommentSuccess,
   props<{ id: number }>()
 );
 
 export const deleteCommentFailure = createAction(
-  ArticleAction.DeleteArticleFailure,
+  ArticleAction.DeleteCommentFailure,
   props<{ errors: Errors }>()
 );
 

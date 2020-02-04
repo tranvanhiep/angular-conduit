@@ -4,7 +4,12 @@ import { UserService } from 'src/app/services';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { State } from 'src/app/reducers';
-import { favorite, unfavorite } from 'src/app/actions';
+import {
+  favorite,
+  unfavorite,
+  favoriteArticle,
+  unfavoriteArticle,
+} from 'src/app/actions';
 import { take, exhaustMap } from 'rxjs/operators';
 
 @Component({
@@ -28,25 +33,30 @@ export class FavoriteButtonComponent implements OnInit {
     this.store
       .pipe(
         select(this.userService.isAuthenticated),
-        take(1),
         exhaustMap(isAuthed => {
           if (!isAuthed) {
             this.router.navigate(['/login']);
           }
           return this.store.pipe(select(state => state.router));
-        })
+        }),
+        take(1)
       )
       .subscribe(({ state }) => {
         const { slug } = this.article;
+        const { params } = state;
 
-        if (/\/article\//.test(state.url)) {
+        if (params && params.slug) {
           if (!this.article.favorited) {
             this.store.dispatch(favorite({ slug }));
           } else {
             this.store.dispatch(unfavorite({ slug }));
           }
         } else {
-          // article list favorite
+          if (!this.article.favorited) {
+            this.store.dispatch(favoriteArticle({ slug }));
+          } else {
+            this.store.dispatch(unfavoriteArticle({ slug }));
+          }
         }
       });
   }

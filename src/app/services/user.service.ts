@@ -6,7 +6,7 @@ import { User } from '../models';
 import { map } from 'rxjs/operators';
 import { State } from '../reducers';
 import { Store, createSelector } from '@ngrx/store';
-import { logout, sessionLogin } from '../actions';
+import { sessionLogin } from '../actions';
 
 @Injectable({
   providedIn: 'root',
@@ -21,8 +21,31 @@ export class UserService {
   get isAuthenticated() {
     return createSelector(
       (state: State) => state.app,
-      ({ currentUser }) => {
-        if (currentUser) {
+      ({ currentUser, hasSessionError, appLoading }) => {
+        if (currentUser || appLoading) {
+          return true;
+        }
+        if (hasSessionError) {
+          return false;
+        }
+        return false;
+      }
+    );
+  }
+
+  get isAuthorized() {
+    return createSelector(
+      (state: State) => state.editor,
+      (state: State) => state.app,
+      ({ article, loading }, { currentUser }) => {
+        if (loading) {
+          return true;
+        }
+        if (
+          article &&
+          currentUser &&
+          article.author.username === currentUser.username
+        ) {
           return true;
         }
         return false;

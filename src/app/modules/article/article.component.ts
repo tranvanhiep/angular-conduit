@@ -1,12 +1,17 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Article, Comment, User, Errors } from 'src/app/models';
 import { Subscription } from 'rxjs';
 import { FormControl, Validators } from '@angular/forms';
 import { notNullValidator } from 'src/app/directives';
 import { Store, select } from '@ngrx/store';
 import { State } from 'src/app/reducers';
-import { loadArticle, addComment, deleteArticle } from 'src/app/actions';
+import {
+  loadArticle,
+  addComment,
+  deleteArticle,
+  resetArticle,
+} from 'src/app/actions';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-article',
@@ -32,12 +37,18 @@ export class ArticleComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
 
-  constructor(private route: ActivatedRoute, private store: Store<State>) {}
+  constructor(private store: Store<State>) {}
 
   ngOnInit() {
-    const routeSub = this.route.params.subscribe(({ slug }) => {
-      this.store.dispatch(loadArticle({ slug }));
-    });
+    this.store
+      .pipe(
+        select(state => state.router),
+        take(1)
+      )
+      .subscribe(({ state }) => {
+        const { slug } = state.params;
+        this.store.dispatch(loadArticle({ slug }));
+      });
 
     const articleSub = this.store
       .pipe(select(({ article, app }) => ({ article, app })))
@@ -82,11 +93,12 @@ export class ArticleComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.subscriptions.push(routeSub, articleSub);
+    this.subscriptions.push(articleSub);
   }
 
   ngOnDestroy() {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.store.dispatch(resetArticle());
   }
 
   deleteArticle() {

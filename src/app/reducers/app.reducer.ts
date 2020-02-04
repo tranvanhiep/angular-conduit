@@ -7,25 +7,27 @@ import {
   updateUserSuccess,
   loadUserSuccess,
   resetApp,
+  sessionLogin,
 } from '../actions';
 import { User } from '../models';
 
 export interface AppState {
   appName: string;
-  appLoaded: boolean;
+  appLoading: boolean;
   currentUser: User;
   hasSessionError: boolean;
 }
 
 const initialState: AppState = {
   appName: 'Conduit',
-  appLoaded: false,
+  appLoading: false,
   currentUser: null,
   hasSessionError: false,
 };
 
 const reducer = createReducer(
   initialState,
+  on(sessionLogin, state => ({ ...state, appLoading: true })),
   on(loginSuccess, (state, { user }) => ({
     ...state,
     currentUser: user,
@@ -36,6 +38,7 @@ const reducer = createReducer(
     loadUserSuccess,
     (state, { user }) => ({
       ...state,
+      appLoading: false,
       currentUser: user,
     })
   ),
@@ -45,6 +48,7 @@ const reducer = createReducer(
   })),
   on(sessionLoginFailure, state => ({
     ...state,
+    appLoading: false,
     currentUser: null,
     hasSessionError: true,
   })),

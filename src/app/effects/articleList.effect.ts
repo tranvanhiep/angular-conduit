@@ -8,8 +8,14 @@ import {
   loadTags,
   loadTagsSuccess,
   loadTagsFailure,
+  favoriteArticle,
+  favoriteArticleSuccess,
+  favoriteArticleFailure,
+  unfavoriteArticle,
+  unfavoriteArticleSuccess,
+  unfavoriteArticleFailure,
 } from '../actions';
-import { exhaustMap, map, catchError } from 'rxjs/operators';
+import { exhaustMap, map, catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Injectable()
@@ -17,7 +23,7 @@ export class ArticleListEffect {
   getArticles$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadArticles),
-      exhaustMap(({ config }) =>
+      switchMap(({ config }) =>
         this.articleService.query(config).pipe(
           map(({ articles, articlesCount }) =>
             loadArticlesSuccess({ articles, articlesCount })
@@ -31,12 +37,34 @@ export class ArticleListEffect {
   getTags$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadTags),
-      exhaustMap(() =>
+      switchMap(() =>
         this.tagService.getAll().pipe(
-          map(
-            tags => loadTagsSuccess({ tags }),
-            catchError(err => of(loadTagsFailure(err)))
-          )
+          map(tags => loadTagsSuccess({ tags })),
+          catchError(err => of(loadTagsFailure(err)))
+        )
+      )
+    )
+  );
+
+  favorite$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(favoriteArticle),
+      exhaustMap(({ slug }) =>
+        this.articleService.favorite(slug).pipe(
+          map(article => favoriteArticleSuccess({ article })),
+          catchError(err => of(favoriteArticleFailure(err)))
+        )
+      )
+    )
+  );
+
+  unfavorite$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(unfavoriteArticle),
+      exhaustMap(({ slug }) =>
+        this.articleService.unfavorite(slug).pipe(
+          map(article => unfavoriteArticleSuccess({ article })),
+          catchError(err => of(unfavoriteArticleFailure(err)))
         )
       )
     )

@@ -1,11 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ArticleConfig } from 'src/app/models';
+import { ArticleConfig, Errors } from 'src/app/models';
 import { UserService } from 'src/app/services';
 import { Store, select } from '@ngrx/store';
 import { State } from 'src/app/reducers';
 import { Subscription } from 'rxjs';
-import { loadTags } from 'src/app/actions';
-import { ActivatedRoute } from '@angular/router';
+import { loadTags, loadArticles } from 'src/app/actions';
 
 @Component({
   selector: 'app-home',
@@ -17,16 +16,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     type: 'all',
     filters: {},
   };
-  tags: string[] = [];
+  tags: string[];
   tagLoading = false;
+  tagsErrors: Errors;
   isAuthenticated = false;
-  subscriptions: Subscription[] = [];
+  private subscriptions: Subscription[] = [];
 
-  constructor(
-    private userService: UserService,
-    private store: Store<State>,
-    private route: ActivatedRoute
-  ) {}
+  constructor(private userService: UserService, private store: Store<State>) {}
 
   ngOnInit() {
     this.store.dispatch(loadTags());
@@ -34,8 +30,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     const authSub = this.store
       .pipe(select(this.userService.isAuthenticated))
       .subscribe(isAuthenticated => {
+        this.isAuthenticated = isAuthenticated;
         if (isAuthenticated) {
-          this.isAuthenticated = true;
           this.setList('feed');
         } else {
           this.setList('all');
@@ -44,16 +40,19 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const tagSub = this.store
       .pipe(select(state => state.articleList))
-      .subscribe(({ tags, tagLoading }) => {
+      .subscribe(articleListState => {
+        const { tags, tagLoading, tagsErrors } = articleListState;
         this.tags = tags;
         this.tagLoading = tagLoading;
+        this.tagsErrors = tagsErrors;
       });
 
     const sessionSub = this.store
       .pipe(select(state => state.app))
       .subscribe(({ hasSessionError }) => {
         if (hasSessionError) {
-          window.location.reload();
+          this.store.dispatch(loadArticles({ config: this.config }));
+          this.store.dispatch(loadTags());
           sessionSub.unsubscribe();
         }
       });
