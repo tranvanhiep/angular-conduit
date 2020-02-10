@@ -21,6 +21,8 @@ export class CommentService {
   }
 
   destroy(slug: string, id: number) {
-    return this.apiService.delete(`/articles/${slug}/comments/${id}`);
+    return this.apiService
+      .delete(`/articles/${slug}/comments/${id}`)
+      .pipe(map(() => id));
   }
 }

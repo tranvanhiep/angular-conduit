@@ -1,10 +1,17 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Article, Comment, User, Errors } from 'src/app/models';
-import { CommentService, UserService, ArticleService } from 'src/app/services';
 import { Subscription } from 'rxjs';
 import { FormControl, Validators } from '@angular/forms';
 import { notNullValidator } from 'src/app/directives';
+import { Store, select } from '@ngrx/store';
+import { State } from 'src/app/reducers';
+import {
+  loadArticle,
+  addComment,
+  deleteArticle,
+  resetArticle,
+} from 'src/app/actions';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-article',
@@ -16,91 +23,93 @@ export class ArticleComponent implements OnInit, OnDestroy {
   comments: Comment[];
   currentUser: User;
   canModify = false;
-  isDeleting = false;
-  isSubmitting = false;
+  deletingArticle = false;
+  articleErrors: Errors;
+  submittingComment = false;
+  deletingComment = false;
   commentControl = new FormControl('', [Validators.required, notNullValidator]);
-  commentErrors: Errors = { errors: {} };
+  commentErrors: Errors;
+  favoriteErrors: Errors;
+  followErrors: Errors;
+  loading = false;
+  favoriting = false;
+  following = false;
 
-  private subscription: Subscription;
+  private subscriptions: Subscription[] = [];
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private commentService: CommentService,
-    private userService: UserService,
-    private articleService: ArticleService
-  ) {}
+  constructor(private store: Store<State>) {}
 
   ngOnInit() {
-    this.route.data.subscribe(data => {
-      this.article = data.article;
-      this.populateComments();
-    });
+    this.store
+      .pipe(
+        select(state => state.router),
+        take(1)
+      )
+      .subscribe(({ state }) => {
+        const { slug } = state.params;
+        this.store.dispatch(loadArticle({ slug }));
+      });
 
-    this.subscription = this.userService.currentUser.subscribe(user => {
-      this.currentUser = user;
-      this.canModify = user.username === this.article.author.username;
-    });
+    const articleSub = this.store
+      .pipe(select(({ article, app }) => ({ article, app })))
+      .subscribe(state => {
+        const {
+          article,
+          deletingArticle,
+          articleErrors,
+          comments,
+          loading,
+          commentErrors,
+          favoriteErrors,
+          followErrors,
+          favoriting,
+          following,
+          submittingComment,
+          submittedComment,
+          deletingComment,
+        } = state.article;
+        const { currentUser } = state.app;
+        this.article = article;
+        this.deletingArticle = deletingArticle;
+        this.articleErrors = articleErrors;
+        this.comments = comments;
+        this.loading = loading;
+        this.commentErrors = commentErrors;
+        this.favoriteErrors = favoriteErrors;
+        this.followErrors = followErrors;
+        this.favoriting = favoriting;
+        this.following = following;
+        this.currentUser = currentUser;
+        this.submittingComment = submittingComment;
+        this.deletingComment = deletingComment;
+
+        if (submittedComment) {
+          this.commentControl.reset('');
+        }
+
+        if (article && currentUser) {
+          const { author } = article;
+          this.canModify = currentUser.username === author.username;
+        }
+      });
+
+    this.subscriptions.push(articleSub);
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
-
-  onToggleFavorite(favorited: boolean) {
-    this.article.favorited = favorited;
-
-    if (favorited) {
-      this.article.favoritesCount++;
-    } else {
-      this.article.favoritesCount--;
-    }
-  }
-
-  onToggleFollow(following: boolean) {
-    this.article.author.following = following;
-  }
-
-  populateComments() {
-    this.commentService.getAll(this.article.slug).subscribe(comments => {
-      this.comments = comments;
-    });
-  }
-
-  onDeleteComment(id: number) {
-    this.comments = this.comments.filter(comment => comment.id !== id);
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.store.dispatch(resetArticle());
   }
 
   deleteArticle() {
-    this.isDeleting = true;
-
-    this.articleService.destroy(this.article.slug).subscribe(
-      article => {
-        this.isDeleting = false;
-        this.router.navigate(['/']);
-      },
-      err => {
-        this.isDeleting = false;
-      }
-    );
+    const { slug } = this.article;
+    this.store.dispatch(deleteArticle({ slug }));
   }
 
   addComment() {
-    this.isSubmitting = true;
-    this.commentErrors = { errors: {} };
-
-    this.commentService
-      .add(this.article.slug, String(this.commentControl.value).trim())
-      .subscribe(
-        comment => {
-          this.isSubmitting = false;
-          this.comments.unshift(comment);
-          this.commentControl.reset('');
-        },
-        err => {
-          this.isSubmitting = false;
-          this.commentErrors = err;
-        }
-      );
+    const { slug } = this.article;
+    this.store.dispatch(
+      addComment({ slug, payload: String(this.commentControl.value).trim() })
+    );
   }
 }

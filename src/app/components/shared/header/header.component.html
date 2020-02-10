@@ -1,6 +1,6 @@
 <nav class="navbar navbar-light">
   <div class="container">
-    <a class="navbar-brand" href="/">conduit</a>
+    <a class="navbar-brand" href="/">{{ appName }}</a>
     <ul class="nav navbar-nav pull-xs-right">
       <li class="nav-item">
         <a
@@ -51,7 +51,7 @@
             <i class="ion-gear-a"></i>&nbsp;Settings
           </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" *ngIf="currentUser">
           <a
             class="nav-link"
             [routerLink]="['/profile', currentUser.username]"

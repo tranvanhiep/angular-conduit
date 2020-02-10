@@ -12,7 +12,7 @@
           >
         </p>
 
-        <app-error-list [errors]="errors.errors"></app-error-list>
+        <app-error-list [errors]="errors"></app-error-list>
 
         <form [formGroup]="authForm" (ngSubmit)="submit()">
           <fieldset [disabled]="isSubmitting">

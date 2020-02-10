@@ -1,0 +1,10 @@
+.page-item {
+  .page-link {
+    cursor: pointer;
+  }
+  &.active {
+    .page-link {
+      pointer-events: none;
+    }
+  }
+}

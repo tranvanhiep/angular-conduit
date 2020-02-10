@@ -1,5 +1,3 @@
 export interface Errors {
-  errors: {
-    [key: string]: string;
-  };
+  [key: string]: string[];
 }

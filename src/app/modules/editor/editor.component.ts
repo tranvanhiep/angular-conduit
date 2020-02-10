@@ -1,77 +1,121 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   Validators,
   FormControl,
 } from '@angular/forms';
-import { Article, Errors } from 'src/app/models';
-import { ArticleService } from 'src/app/services';
-import { map } from 'rxjs/operators';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Errors } from 'src/app/models';
+import { UserService } from 'src/app/services';
+import { Router } from '@angular/router';
+import { State } from 'src/app/reducers';
+import { Store, select } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+import { loadEditor, submitArticle, resetEditor } from 'src/app/actions';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.scss'],
 })
-export class EditorComponent implements OnInit {
+export class EditorComponent implements OnInit, OnDestroy {
   articleForm: FormGroup;
-  article: Article = {} as Article;
+  slug: string;
   tagField = new FormControl('');
   isSubmitting = false;
-  errors: Errors = { errors: {} };
+  errors: Errors = {};
+  loading = false;
+  tagList: string[] = [];
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private articleService: ArticleService,
+    private userService: UserService,
     private router: Router,
-    private route: ActivatedRoute
+    private store: Store<State>
   ) {
     this.articleForm = this.fb.group({
       title: ['', Validators.required],
       description: ['', Validators.required],
       body: ['', Validators.required],
     });
-    this.article.tagList = [];
   }
 
   ngOnInit() {
-    this.route.data.subscribe(data => {
-      if (!!data.article) {
-        this.article = data.article;
-        this.articleForm.patchValue(data.article);
-      }
-    });
+    this.store
+      .pipe(
+        select(state => state.router),
+        take(1)
+      )
+      .subscribe(({ state }) => {
+        const { slug } = state.params;
+        if (slug) {
+          this.slug = slug;
+          this.store.dispatch(loadEditor({ slug }));
+        }
+      });
+
+    const authSub = this.store
+      .pipe(select(this.userService.isAuthenticated))
+      .subscribe(isAuthed => {
+        if (!isAuthed) {
+          this.router.navigate(['/login']);
+        }
+      });
+
+    const authorSub = this.store
+      .pipe(select(this.userService.isAuthorized))
+      .subscribe(isAuthor => {
+        if (!isAuthor && this.slug) {
+          this.router.navigate(['/']);
+        }
+      });
+
+    const editorSub = this.store
+      .pipe(select(state => state.editor))
+      .subscribe(editorState => {
+        const { article, loading, isSubmitting, errors } = editorState;
+        this.loading = loading;
+        this.isSubmitting = isSubmitting;
+        this.errors = errors;
+
+        if (article) {
+          // Fix can't assign readonly variable
+          this.tagList = [...article.tagList];
+          this.articleForm.patchValue(article);
+        }
+      });
+
+    this.subscriptions.push(authSub, authorSub, editorSub);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.store.dispatch(resetEditor());
   }
 
   addTag() {
     const tag = this.tagField.value;
 
-    if (tag.trim() && this.article.tagList.indexOf(tag) < 0) {
-      this.article.tagList.push(tag);
+    if (tag.trim() && this.tagList.indexOf(tag) < 0) {
+      this.tagList.push(tag);
     }
 
     this.tagField.reset('');
   }
 
   removeTag(tag: string) {
-    this.article.tagList = this.article.tagList.filter(value => value !== tag);
+    this.tagList = this.tagList.filter(value => value !== tag);
   }
 
   submit() {
-    this.isSubmitting = true;
-    Object.assign(this.article, this.articleForm.value);
+    const article = {
+      ...this.articleForm.value,
+      tagList: this.tagList,
+      slug: this.slug,
+    };
 
-    this.articleService.save(this.article).subscribe(
-      (article: Article) => {
-        this.isSubmitting = false;
-        this.router.navigate(['/article', article.slug]);
-      },
-      err => {
-        this.isSubmitting = false;
-        this.errors = err;
-      }
-    );
+    this.store.dispatch(submitArticle({ article }));
   }
 }

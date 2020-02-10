@@ -1,9 +1,16 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Article } from 'src/app/models';
-import { ArticleService, UserService } from 'src/app/services';
+import { UserService } from 'src/app/services';
 import { Router } from '@angular/router';
-import { concatMap, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { State } from 'src/app/reducers';
+import {
+  favorite,
+  unfavorite,
+  favoriteArticle,
+  unfavoriteArticle,
+} from 'src/app/actions';
+import { take, exhaustMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-favorite-button',
@@ -12,55 +19,45 @@ import { of } from 'rxjs';
 })
 export class FavoriteButtonComponent implements OnInit {
   @Input() article: Article;
-  @Output() toogle = new EventEmitter<boolean>();
-  isSubmitting = false;
+  @Input() isSubmitting = false;
 
   constructor(
-    private articleService: ArticleService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private store: Store<State>
   ) {}
 
   ngOnInit() {}
 
   toggleFavorite() {
-    this.isSubmitting = true;
-
-    this.userService.isAuthenticated
+    this.store
       .pipe(
-        concatMap(isAuthed => {
+        select(this.userService.isAuthenticated),
+        exhaustMap(isAuthed => {
           if (!isAuthed) {
             this.router.navigate(['/login']);
-            return of(null);
           }
-
-          if (!this.article.favorited) {
-            return this.articleService.favorite(this.article.slug).pipe(
-              tap(
-                data => {
-                  this.isSubmitting = false;
-                  this.toogle.emit(true);
-                },
-                err => {
-                  this.isSubmitting = false;
-                }
-              )
-            );
-          } else {
-            return this.articleService.unfavorite(this.article.slug).pipe(
-              tap(
-                data => {
-                  this.isSubmitting = false;
-                  this.toogle.emit(false);
-                },
-                err => {
-                  this.isSubmitting = false;
-                }
-              )
-            );
-          }
-        })
+          return this.store.pipe(select(state => state.router));
+        }),
+        take(1)
       )
-      .subscribe();
+      .subscribe(({ state }) => {
+        const { slug } = this.article;
+        const { params } = state;
+
+        if (params && params.slug) {
+          if (!this.article.favorited) {
+            this.store.dispatch(favorite({ slug }));
+          } else {
+            this.store.dispatch(unfavorite({ slug }));
+          }
+        } else {
+          if (!this.article.favorited) {
+            this.store.dispatch(favoriteArticle({ slug }));
+          } else {
+            this.store.dispatch(unfavoriteArticle({ slug }));
+          }
+        }
+      });
   }
 }

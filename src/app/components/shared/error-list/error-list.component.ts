@@ -15,7 +15,7 @@ export class ErrorListComponent implements OnInit {
 
   @Input()
   set errors(errorList: Errors) {
-    this.formattedErrors = Object.keys(errorList.errors || {}).map(key => {
+    this.formattedErrors = Object.keys(errorList || {}).map(key => {
       return `${key} ${errorList[key]}`;
     });
   }

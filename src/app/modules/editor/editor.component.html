@@ -4,8 +4,8 @@
       <div class="col-md-10 offset-md-1 col-xs-12">
         <app-error-list [errors]="errors"></app-error-list>
 
-        <form [formGroup]="articleForm" (ngSubmit)="submit()">
-          <fieldset [disabled]="isSubmitting">
+        <form [formGroup]="articleForm">
+          <fieldset [disabled]="isSubmitting || loading">
             <fieldset class="form-group">
               <input
                 type="text"
@@ -39,10 +39,7 @@
                 (keyup.enter)="addTag()"
               />
               <div class="tag-list">
-                <span
-                  class="tag-default tag-pill"
-                  *ngFor="let tag of article.tagList"
-                >
+                <span class="tag-default tag-pill" *ngFor="let tag of tagList">
                   <i class="ion-close-round" (click)="removeTag(tag)">
                     {{ tag }}
                   </i>
@@ -51,7 +48,8 @@
             </fieldset>
             <button
               class="btn btn-lg pull-xs-right btn-primary"
-              type="submit"
+              type="button"
+              (click)="submit()"
               [disabled]="!articleForm.valid"
             >
               Publish Article

@@ -12,14 +12,4 @@ export class ArticlePreviewComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {}
-
-  onToggleFavorite(favorited: boolean) {
-    this.article.favorited = favorited;
-
-    if (favorited) {
-      this.article.favoritesCount++;
-    } else {
-      this.article.favoritesCount--;
-    }
-  }
 }

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Profile, ArticleConfig } from 'src/app/models';
+import { ArticleConfig } from 'src/app/models';
+import { Store, select } from '@ngrx/store';
+import { State } from 'src/app/reducers';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile-favorite',
@@ -8,16 +10,28 @@ import { Profile, ArticleConfig } from 'src/app/models';
   styleUrls: ['./profile-favorite.component.scss'],
 })
 export class ProfileFavoriteComponent implements OnInit {
-  profileFavorite: ArticleConfig = { type: 'all', filters: {} };
+  profileFavorite: ArticleConfig;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private store: Store<State>) {}
 
   ngOnInit() {
-    this.route.parent.data.subscribe((data: { profile: Profile }) => {
-      this.profileFavorite = {
-        ...this.profileFavorite,
-        ...{ filters: { favorited: data.profile.username } },
-      };
-    });
+    this.store
+      .pipe(
+        distinctUntilChanged(
+          ({ router: prevRouter }, { router: currRouter }) =>
+            prevRouter.state.params.username ===
+            currRouter.state.params.username
+        ),
+        select(state => state.profile)
+      )
+      .subscribe(({ profile }) => {
+        if (profile) {
+          const { username } = profile;
+          this.profileFavorite = {
+            type: 'all',
+            filters: { favorited: username },
+          };
+        }
+      });
   }
 }
