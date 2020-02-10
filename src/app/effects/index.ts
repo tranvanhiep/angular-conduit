@@ -5,3 +5,4 @@ export * from './profile.effect';
 export * from './articleList.effect';
 export * from './article.effect';
 export * from './editor.effect';
+export * from './home.effect';

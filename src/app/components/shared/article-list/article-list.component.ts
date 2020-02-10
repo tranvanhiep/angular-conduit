@@ -34,16 +34,11 @@ export class ArticleListComponent implements OnInit, OnDestroy {
     const articlesSub = this.store
       .pipe(select(state => state.articleList))
       .subscribe(articleListState => {
-        const {
-          articleLoading,
-          articles,
-          articlesCount,
-          articlesErrors,
-        } = articleListState;
+        const { loading, articles, articlesCount, errors } = articleListState;
 
-        this.loading = articleLoading;
+        this.loading = loading;
         this.articles = articles;
-        this.errors = articlesErrors;
+        this.errors = errors;
         this.totalPages = Array.from(
           new Array(Math.ceil(articlesCount / this.limit)),
           (value, key) => ++key
@@ -58,24 +53,28 @@ export class ArticleListComponent implements OnInit, OnDestroy {
     this.store.dispatch(resetArticles());
   }
 
-  diffChecker(oldObj: ArticleConfig, newObj: ArticleConfig) {
-    let diff = false;
-    if (!oldObj || !newObj) {
+  diffChecker(prev: ArticleConfig, curr: ArticleConfig) {
+    if (!prev || curr.type !== prev.type) {
       return true;
     }
-    if (oldObj.type !== newObj.type) {
-      return true;
-    } else {
-      for (const key in Object.keys(oldObj.filters).length >=
-      Object.keys(newObj).length
-        ? oldObj.filters
-        : newObj.filters) {
-        if (oldObj.filters[key] !== newObj.filters[key]) {
-          diff = true;
-          break;
+
+    const prevFilters = Object.keys(prev.filters);
+    const currFilters = Object.keys(curr.filters);
+
+    if (prevFilters.length >= currFilters.length) {
+      return !prevFilters.every(key => {
+        if (prev.filters[key] !== curr.filters[key]) {
+          return false;
         }
-      }
-      return diff;
+        return true;
+      });
+    } else {
+      return !currFilters.every(key => {
+        if (prev.filters[key] !== curr.filters[key]) {
+          return false;
+        }
+        return true;
+      });
     }
   }
 

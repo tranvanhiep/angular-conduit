@@ -4,9 +4,6 @@ import {
   loadArticles,
   loadArticlesSuccess,
   loadArticlesFailure,
-  loadTags,
-  loadTagsSuccess,
-  loadTagsFailure,
   favoriteArticle,
   favoriteArticleSuccess,
   favoriteArticleFailure,
@@ -19,53 +16,36 @@ import {
 export interface ArticleListState {
   articles: Article[];
   articlesCount: number;
-  articleLoading: boolean;
+  loading: boolean;
   favoriteErrors: Errors;
-  tags: string[];
-  tagLoading: boolean;
-  articlesErrors: Errors;
-  tagsErrors: Errors;
+  errors: Errors;
 }
 
 const initialState: ArticleListState = {
   articles: null,
-  articleLoading: false,
+  loading: false,
   favoriteErrors: null,
-  tags: null,
-  tagLoading: false,
   articlesCount: 0,
-  articlesErrors: null,
-  tagsErrors: null,
+  errors: null,
 };
 
 const reducer = createReducer(
   initialState,
   on(loadArticles, state => ({
     ...state,
-    articleLoading: true,
-    articlesErrors: null,
+    loading: true,
+    errors: null,
   })),
   on(loadArticlesSuccess, (state, { articles, articlesCount }) => ({
     ...state,
     articles,
     articlesCount,
-    articleLoading: false,
+    loading: false,
   })),
   on(loadArticlesFailure, (state, { errors }) => ({
     ...state,
-    articlesErrors: errors,
-    articleLoading: false,
-  })),
-  on(loadTags, state => ({ ...state, tagLoading: true, tagsErrors: null })),
-  on(loadTagsSuccess, (state, { tags }) => ({
-    ...state,
-    tagLoading: false,
-    tags,
-  })),
-  on(loadTagsFailure, (state, { errors }) => ({
-    ...state,
-    tagLoading: false,
-    tagsErrors: errors,
+    errors,
+    loading: false,
   })),
   on(favoriteArticle, unfavoriteArticle, state => ({
     ...state,

@@ -39,12 +39,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
 
     const tagSub = this.store
-      .pipe(select(state => state.articleList))
-      .subscribe(articleListState => {
-        const { tags, tagLoading, tagsErrors } = articleListState;
+      .pipe(select(state => state.home))
+      .subscribe(homeState => {
+        const { tags, loading, errors } = homeState;
         this.tags = tags;
-        this.tagLoading = tagLoading;
-        this.tagsErrors = tagsErrors;
+        this.tagLoading = loading;
+        this.tagsErrors = errors;
       });
 
     const sessionSub = this.store

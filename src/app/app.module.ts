@@ -20,6 +20,7 @@ import {
   ArticleListEffect,
   ArticleEffect,
   EditorEffect,
+  HomeEffect,
 } from './effects';
 import {
   StoreRouterConnectingModule,
@@ -55,6 +56,7 @@ import {
       ArticleListEffect,
       ArticleEffect,
       EditorEffect,
+      HomeEffect,
     ]),
     StoreRouterConnectingModule.forRoot({
       navigationActionTiming: NavigationActionTiming.PostActivation,

@@ -9,6 +9,7 @@ import { ArticleListState, articleListReducer } from './articleList.reducer';
 import { ArticleState, articleReducer } from './article.reducer';
 import { EditorState, editorReducer } from './editor.reducer';
 import { RouterStateUrl } from './custom-route.serializer';
+import { homeReducer, HomeState } from './home.reducer';
 
 export interface State {
   auth: AuthState;
@@ -18,6 +19,7 @@ export interface State {
   editor: EditorState;
   settings: SettingsState;
   profile: ProfileState;
+  home: HomeState;
   router: RouterReducerState<RouterStateUrl>;
 }
 
@@ -29,6 +31,7 @@ export const reducers: ActionReducerMap<State> = {
   editor: editorReducer,
   settings: settingsReducer,
   profile: profileReducer,
+  home: homeReducer,
   router: routerReducer,
 };
 
